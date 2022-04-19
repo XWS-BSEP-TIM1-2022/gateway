@@ -6,7 +6,7 @@ import (
 	"gateway/infrastructure/api"
 	"gateway/startup/config"
 	userGateway "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/gateway"
-	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/tracer"
+	tracer "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/tracer"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	otgo "github.com/opentracing/opentracing-go"
@@ -45,9 +45,14 @@ func (server *Server) GetTracer() otgo.Tracer {
 func (server *Server) GetCloser() io.Closer {
 	return server.closer
 }
+func (server *Server) CloseTracer() error {
+	return server.closer.Close()
+}
 
 func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct) {
 	// Create a listener on TCP port
+	defer server.CloseTracer()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", server.Config.GrpcPort))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
