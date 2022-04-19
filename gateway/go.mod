@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
