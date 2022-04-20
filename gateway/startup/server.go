@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gateway/infrastructure/api"
 	"gateway/startup/config"
-	userGateway "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/gateway"
+	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	tracer "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/tracer"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -18,7 +18,7 @@ import (
 )
 
 type Server struct {
-	userGateway.UnimplementedUserGatewayServer
+	userService.UnimplementedUserServiceServer
 	tracer otgo.Tracer
 	closer io.Closer
 	Config *config.Config
@@ -67,7 +67,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct) {
 	}
 
 	// Attach the Greeter service to the server
-	userGateway.RegisterUserGatewayServer(s, userGatewayS)
+	userService.RegisterUserServiceServer(s, userGatewayS)
 	// Serve gRPC server
 	log.Println(fmt.Sprintf("Serving gRPC on localhost:%s", server.Config.GrpcPort))
 	go func() {
@@ -98,7 +98,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct) {
 
 	gwmux := runtime.NewServeMux()
 	// Register Greeter
-	err = userGateway.RegisterUserGatewayHandler(context.Background(), gwmux, conn)
+	err = userService.RegisterUserServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}

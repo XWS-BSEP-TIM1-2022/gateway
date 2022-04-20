@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"gateway/infrastructure/services"
 	"gateway/startup/config"
-	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/gateway"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
+	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 )
 
 type UserGatewayStruct struct {
-	gateway.UnimplementedUserGatewayServer
+	userService.UnimplementedUserServiceServer
 	config *config.Config
 }
 
