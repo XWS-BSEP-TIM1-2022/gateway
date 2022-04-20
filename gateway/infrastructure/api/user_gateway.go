@@ -11,36 +11,41 @@ import (
 
 type UserGatewayStruct struct {
 	userService.UnimplementedUserServiceServer
-	config *config.Config
+	config     *config.Config
+	userClient userService.UserServiceClient
 }
 
 func NewUserGateway(c *config.Config) *UserGatewayStruct {
 	return &UserGatewayStruct{
-		config: c,
+		config:     c,
+		userClient: services.NewUserClient(fmt.Sprintf("%s:%s", c.UserServiceHost, c.UserServicePort)),
 	}
 }
 
 func (s *UserGatewayStruct) GetRequest(ctx context.Context, in *user.UserIdRequest) (*user.GetResponse, error) {
-	userClient := services.NewUserClient(fmt.Sprintf("%s:%s", s.config.UserServiceHost, s.config.UserServicePort))
-	return userClient.GetRequest(ctx, in)
+	return s.userClient.GetRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyRequest) (*user.GetAllUsers, error) {
-	userClient := services.NewUserClient(fmt.Sprintf("%s:%s", s.config.UserServiceHost, s.config.UserServicePort))
-	return userClient.GetAllRequest(ctx, in)
+	return s.userClient.GetAllRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PostRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
-	userClient := services.NewUserClient(fmt.Sprintf("%s:%s", s.config.UserServiceHost, s.config.UserServicePort))
-	return userClient.PostRequest(ctx, in)
+	return s.userClient.PostRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
+	return s.userClient.PostAdminRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
-	userClient := services.NewUserClient(fmt.Sprintf("%s:%s", s.config.UserServiceHost, s.config.UserServicePort))
-	return userClient.UpdateRequest(ctx, in)
+	return s.userClient.UpdateRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	userClient := services.NewUserClient(fmt.Sprintf("%s:%s", s.config.UserServiceHost, s.config.UserServicePort))
-	return userClient.DeleteRequest(ctx, in)
+	return s.userClient.DeleteRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.CredentialsRequest) (*user.LoginResponse, error) {
+	return s.userClient.LoginRequest(ctx, in)
 }
