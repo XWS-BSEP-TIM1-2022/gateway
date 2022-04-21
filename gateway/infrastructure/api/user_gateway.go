@@ -49,3 +49,7 @@ func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRe
 func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.CredentialsRequest) (*user.LoginResponse, error) {
 	return s.userClient.LoginRequest(ctx, in)
 }
+
+func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
+	return s.userClient.SearchUsersRequest(ctx, in)
+}
