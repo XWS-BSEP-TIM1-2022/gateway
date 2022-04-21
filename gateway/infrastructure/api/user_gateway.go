@@ -26,7 +26,7 @@ func (s *UserGatewayStruct) GetRequest(ctx context.Context, in *user.UserIdReque
 	return s.userClient.GetRequest(ctx, in)
 }
 
-func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyRequest) (*user.GetAllUsers, error) {
+func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyRequest) (*user.UsersResponse, error) {
 	return s.userClient.GetAllRequest(ctx, in)
 }
 
