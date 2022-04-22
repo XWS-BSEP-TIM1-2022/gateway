@@ -109,7 +109,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct) {
 	}
 
 	log.Println(fmt.Sprintf("Serving gRPC-Gateway on http://localhost:%s", server.Config.HttpPort))
-	log.Fatalln(gwServer.ListenAndServe())
+	log.Fatalln(gwServer.ListenAndServeTLS("certificates/dislinkt.cer", "certificates/dislinkt_private_key.key"))
 }
 
 func (server *Server) Start() {
