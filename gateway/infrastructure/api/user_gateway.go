@@ -2,11 +2,13 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"gateway/infrastructure/services"
 	"gateway/startup/config"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
+	"google.golang.org/grpc/metadata"
 )
 
 type UserGatewayStruct struct {
@@ -39,6 +41,12 @@ func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserR
 }
 
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
 	return s.userClient.UpdateRequest(ctx, in)
 }
 
@@ -52,4 +60,8 @@ func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.Credentia
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
 	return s.userClient.SearchUsersRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) IsUserAuthenticated(ctx context.Context, in *userService.AuthRequest) (*userService.AuthResponse, error) {
+	return s.userClient.IsUserAuthenticated(ctx, in)
 }
