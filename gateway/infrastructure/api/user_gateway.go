@@ -65,3 +65,13 @@ func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.Sea
 func (s *UserGatewayStruct) IsUserAuthenticated(ctx context.Context, in *userService.AuthRequest) (*userService.AuthResponse, error) {
 	return s.userClient.IsUserAuthenticated(ctx, in)
 }
+
+func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.UpdatePasswordRequest(ctx, in)
+}
