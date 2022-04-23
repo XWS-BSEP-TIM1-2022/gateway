@@ -108,8 +108,9 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct) {
 		Handler: tracer.TracingWrapper(gwmux),
 	}
 
-	log.Println(fmt.Sprintf("Serving gRPC-Gateway on http://localhost:%s", server.Config.HttpPort))
-	log.Fatalln(gwServer.ListenAndServeTLS("certificates/dislinkt.cer", "certificates/dislinkt_private_key.key"))
+	log.Println(fmt.Sprintf("Serving gRPC-Gateway on https://localhost:%s", server.Config.HttpPort))
+
+	log.Fatalln(gwServer.ListenAndServeTLS(server.Config.CertificatePath, server.Config.CertificateKeyPath))
 }
 
 func (server *Server) Start() {
