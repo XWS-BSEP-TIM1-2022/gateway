@@ -81,5 +81,15 @@ func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in
 }
 
 func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
 	return s.userClient.PostExperienceRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *user.DeleteUsersExperienceRequest) (*user.EmptyRequest, error) {
+	return s.userClient.DeleteExperienceRequest(ctx, in)
 }
