@@ -75,3 +75,11 @@ func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userS
 	}
 	return s.userClient.UpdatePasswordRequest(ctx, in)
 }
+
+func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in *userService.ExperienceRequest) (*user.ExperienceResponse, error) {
+	return s.userClient.GetAllUsersExperienceRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
+	return s.userClient.PostExperienceRequest(ctx, in)
+}
