@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gateway/infrastructure/services"
 	"gateway/startup/config"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
+	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
 	"google.golang.org/grpc/metadata"
 )
 

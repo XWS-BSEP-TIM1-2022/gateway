@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gateway/infrastructure/api"
 	"gateway/startup/config"
+	connectionService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/connection"
 	postService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/post"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	tracer "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/tracer"
@@ -50,7 +51,7 @@ func (server *Server) CloseTracer() error {
 	return server.closer.Close()
 }
 
-func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatewayS *api.PostGatewayStruct) {
+func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatewayS *api.PostGatewayStruct, connectionGatewayS *api.ConnectionGatewayStruct) {
 	// Create a listener on TCP port
 	defer server.CloseTracer()
 
@@ -70,6 +71,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 	// Attach the Greeter service to the server
 	userService.RegisterUserServiceServer(s, userGatewayS)
 	postService.RegisterPostServiceServer(s, postGatewayS)
+	connectionService.RegisterConnectionServiceServer(s, connectionGatewayS)
 	// Serve gRPC server
 	log.Println(fmt.Sprintf("Serving gRPC on localhost:%s", server.Config.GrpcPort))
 	go func() {
@@ -109,6 +111,10 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 	if err != nil {
 		log.Fatalln("Failed to register Post gateway:", err)
 	}
+	err = connectionService.RegisterConnectionServiceHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register Connection gateway:", err)
+	}
 
 	gwServer := &http.Server{
 		Addr:    fmt.Sprintf(":%s", server.Config.HttpPort),
@@ -121,10 +127,10 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 }
 
 func (server *Server) Start() {
-	userGateway, postGateway := server.initHandlers()
-	server.StartServer(userGateway, postGateway)
+	userGateway, postGateway, connectionGateway := server.initHandlers()
+	server.StartServer(userGateway, postGateway, connectionGateway)
 }
 
-func (server *Server) initHandlers() (*api.UserGatewayStruct, *api.PostGatewayStruct) {
-	return api.NewUserGateway(server.Config), api.NewPostGateway(server.Config)
+func (server *Server) initHandlers() (*api.UserGatewayStruct, *api.PostGatewayStruct, *api.ConnectionGatewayStruct) {
+	return api.NewUserGateway(server.Config), api.NewPostGateway(server.Config), api.NewConnectionGateway(server.Config)
 }

@@ -3,9 +3,9 @@ package api
 import (
 	"context"
 	"fmt"
-	"gateway/infrastructure/services"
 	"gateway/startup/config"
 	postService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/post"
+	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
 )
 
 type PostGatewayStruct struct {
