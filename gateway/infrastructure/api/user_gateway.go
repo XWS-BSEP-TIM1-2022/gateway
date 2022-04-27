@@ -43,6 +43,9 @@ func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserR
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
 	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
@@ -69,6 +72,9 @@ func (s *UserGatewayStruct) IsUserAuthenticated(ctx context.Context, in *userSer
 func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
 	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
@@ -83,6 +89,9 @@ func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in
 func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
 	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
