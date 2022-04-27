@@ -102,3 +102,10 @@ func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.
 func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *user.DeleteUsersExperienceRequest) (*user.EmptyRequest, error) {
 	return s.userClient.DeleteExperienceRequest(ctx, in)
 }
+
+func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillRequest) (*user.EmptyRequest, error) {
+	return s.userClient.AddUserSkill(ctx, in)
+}
+func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInterestRequest) (*user.EmptyRequest, error) {
+	return s.userClient.AddUserInterest(ctx, in)
+}
