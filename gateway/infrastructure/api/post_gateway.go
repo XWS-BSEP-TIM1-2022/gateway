@@ -40,3 +40,23 @@ func (s *PostGatewayStruct) CreateRequest(ctx context.Context, in *postService.P
 func (s *PostGatewayStruct) DeleteRequest(ctx context.Context, in *postService.PostIdRequest) (*postService.EmptyRequest, error) {
 	return s.postClient.DeleteRequest(ctx, in)
 }
+
+func (s *PostGatewayStruct) GetCommentRequest(ctx context.Context, in *postService.CommentIdRequest) (*postService.CommentResponse, error) {
+	return s.postClient.GetCommentRequest(ctx, in)
+}
+
+func (s *PostGatewayStruct) GetAllCommentsRequest(ctx context.Context, in *postService.EmptyRequest) (*postService.CommentsResponse, error) {
+	return s.postClient.GetAllCommentsRequest(ctx, in)
+}
+
+func (s *PostGatewayStruct) GetAllCommentsFromPostRequest(ctx context.Context, in *postService.PostCommentsRequest) (*postService.CommentsResponse, error) {
+	return s.postClient.GetAllCommentsFromPostRequest(ctx, in)
+}
+
+func (s *PostGatewayStruct) CreateCommentRequest(ctx context.Context, in *postService.CommentRequest) (*postService.CommentResponse, error) {
+	return s.postClient.CreateCommentRequest(ctx, in)
+}
+
+func (s *PostGatewayStruct) DeleteCommentRequest(ctx context.Context, in *postService.CommentIdRequest) (*postService.EmptyRequest, error) {
+	return s.postClient.DeleteCommentRequest(ctx, in)
+}
