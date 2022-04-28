@@ -72,7 +72,7 @@ func (s *ConnectionGatewayStruct) DeleteConnection(ctx context.Context, in *conn
 		return nil, errors.New("unauthorized")
 	}
 	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "ADMIN" || err != nil {
+	if role.UserRole != "USER" || err != nil {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.DeleteConnection(ctx, in)
