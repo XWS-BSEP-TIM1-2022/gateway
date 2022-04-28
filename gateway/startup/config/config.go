@@ -23,8 +23,8 @@ func NewConfig() *Config {
 		UserServicePort:       getEnv("USER_SERVICE_PORT", "8085"),
 		PostServiceHost:       getEnv("POST_SERVICE_HOST", "localhost"),
 		PostServicePort:       getEnv("POST_SERVICE_PORT", "8086"),
-		ConnectionServiceHost: getEnv("POST_SERVICE_HOST", "localhost"),
-		ConnectionServicePort: getEnv("POST_SERVICE_PORT", "8087"),
+		ConnectionServiceHost: getEnv("CONNECTION_SERVICE_HOST", "localhost"),
+		ConnectionServicePort: getEnv("CONNECTION_SERVICE_PORT", "8087"),
 		CertificatePath:       getEnv("CERTIFICATE_PATH", "certificates/dislinkt.cer"),
 		CertificateKeyPath:    getEnv("CERTIFICATE_KEY_PATH", "certificates/dislinkt_private_key.key"),
 	}
