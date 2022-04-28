@@ -8,6 +8,7 @@ import (
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
+	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/token"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -62,6 +63,15 @@ func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.Credentia
 }
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt != nil {
+		var err error
+		in.UserId, err = token.NewJwtManagerDislinkt(0).GetUserIdFromToken(jwt[0])
+		if err != nil {
+			return nil, err
+		}
+	}
 	return s.userClient.SearchUsersRequest(ctx, in)
 }
 
