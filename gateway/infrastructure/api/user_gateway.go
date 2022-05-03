@@ -119,3 +119,11 @@ func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillR
 func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInterestRequest) (*user.EmptyRequest, error) {
 	return s.userClient.AddUserInterest(ctx, in)
 }
+
+func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveInterestRequest) (*user.EmptyRequest, error) {
+	return s.userClient.RemoveInterest(ctx, in)
+}
+
+func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkillRequest) (*user.EmptyRequest, error) {
+	return s.userClient.RemoveSkill(ctx, in)
+}
