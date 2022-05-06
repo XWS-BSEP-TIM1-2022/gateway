@@ -62,6 +62,49 @@ func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.Credentia
 	return s.userClient.LoginRequest(ctx, in)
 }
 
+func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest) (*user.TFAResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.GetQR2FA(ctx, in)
+}
+
+func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) (*user.EmptyRequest, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.Enable2FA(ctx, in)
+}
+
+func (s *UserGatewayStruct) Verify2FA(ctx context.Context, in *user.TFARequest) (*user.LoginResponse, error) {
+	return s.userClient.Verify2FA(ctx, in)
+}
+
+func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.Disable2FA(ctx, in)
+}
+
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
