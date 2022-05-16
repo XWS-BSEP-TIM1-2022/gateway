@@ -13,6 +13,8 @@ type Config struct {
 	CertificateKeyPath    string
 	ConnectionServiceHost string
 	ConnectionServicePort string
+	JobServiceHost        string
+	JobServicePort        string
 }
 
 func NewConfig() *Config {
@@ -25,6 +27,8 @@ func NewConfig() *Config {
 		PostServicePort:       getEnv("POST_SERVICE_PORT", "8086"),
 		ConnectionServiceHost: getEnv("CONNECTION_SERVICE_HOST", "localhost"),
 		ConnectionServicePort: getEnv("CONNECTION_SERVICE_PORT", "8087"),
+		JobServiceHost:        getEnv("JOB_SERVICE_HOST", "localhost"),
+		JobServicePort:        getEnv("JOB_SERVICE_PORT", "8088"),
 		CertificatePath:       getEnv("CERTIFICATE_PATH", "certificates/dislinkt.cer"),
 		CertificateKeyPath:    getEnv("CERTIFICATE_KEY_PATH", "certificates/dislinkt_private_key.key"),
 	}

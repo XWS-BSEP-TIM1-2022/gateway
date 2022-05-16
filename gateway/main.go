@@ -2,7 +2,7 @@ package main
 
 import (
 	"gateway/startup"
-	config "gateway/startup/config"
+	"gateway/startup/config"
 )
 
 func main() {
