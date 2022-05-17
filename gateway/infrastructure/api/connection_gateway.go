@@ -32,8 +32,8 @@ func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *con
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.NewUserConnection(ctx, in)
@@ -45,8 +45,8 @@ func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *con
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.ApproveConnection(ctx, in)
@@ -58,8 +58,8 @@ func (s *ConnectionGatewayStruct) RejectConnection(ctx context.Context, in *conn
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.RejectConnection(ctx, in)
@@ -71,8 +71,8 @@ func (s *ConnectionGatewayStruct) DeleteConnection(ctx context.Context, in *conn
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.DeleteConnection(ctx, in)
@@ -84,8 +84,8 @@ func (s *ConnectionGatewayStruct) GetAllConnections(ctx context.Context, in *con
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.GetAllConnections(ctx, in)
@@ -97,8 +97,8 @@ func (s *ConnectionGatewayStruct) GetFollowings(ctx context.Context, in *connect
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.GetFollowings(ctx, in)
@@ -110,8 +110,8 @@ func (s *ConnectionGatewayStruct) GetFollowers(ctx context.Context, in *connecti
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.GetFollowers(ctx, in)
@@ -123,8 +123,8 @@ func (s *ConnectionGatewayStruct) GetAllRequestConnectionsByUserId(ctx context.C
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.GetAllRequestConnectionsByUserId(ctx, in)
@@ -136,8 +136,8 @@ func (s *ConnectionGatewayStruct) GetAllPendingConnectionsByUserId(ctx context.C
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
-	if role.UserRole != "USER" || err != nil {
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil || role.UserRole != "USER" {
 		return nil, errors.New("unauthorized")
 	}
 	return s.connectionClient.GetAllPendingConnectionsByUserId(ctx, in)

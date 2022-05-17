@@ -1,23 +1,28 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"gateway/startup/config"
 	jobService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/job"
+	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/metadata"
 )
 
 type JobGatewayStruct struct {
 	jobService.UnimplementedJobServiceServer
-	config    *config.Config
-	jobClient jobService.JobServiceClient
+	config     *config.Config
+	jobClient  jobService.JobServiceClient
+	userClient userService.UserServiceClient
 }
 
 func NewJobGateway(c *config.Config) *JobGatewayStruct {
 	return &JobGatewayStruct{
-		config:    c,
-		jobClient: services.NewJobClient(fmt.Sprintf("%s:%s", c.JobServiceHost, c.JobServicePort)),
+		config:     c,
+		jobClient:  services.NewJobClient(fmt.Sprintf("%s:%s", c.JobServiceHost, c.JobServicePort)),
+		userClient: services.NewUserClient(fmt.Sprintf("%s:%s", c.UserServiceHost, c.UserServicePort)),
 	}
 }
 
@@ -30,6 +35,16 @@ func (s *JobGatewayStruct) GetAllRequest(ctx context.Context, in *jobService.Emp
 }
 
 func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserRequest) (*jobService.GetResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	userId, err := s.userClient.IsApiTokenValid(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	in.Job.UserId = userId.UserId
 	return s.jobClient.PostRequest(ctx, in)
 }
 

@@ -8,7 +8,6 @@ import (
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
-	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/token"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -47,7 +46,7 @@ func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequ
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -68,7 +67,7 @@ func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -81,7 +80,7 @@ func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) 
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -98,7 +97,7 @@ func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdReque
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -106,20 +105,15 @@ func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdReque
 }
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt != nil {
-		var err error
-		in.UserId, err = token.NewJwtManagerDislinkt(0).GetUserIdFromToken(jwt[0])
-		if err != nil {
-			return nil, err
-		}
-	}
 	return s.userClient.SearchUsersRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) IsUserAuthenticated(ctx context.Context, in *userService.AuthRequest) (*userService.AuthResponse, error) {
 	return s.userClient.IsUserAuthenticated(ctx, in)
+}
+
+func (s *UserGatewayStruct) IsApiTokenValid(ctx context.Context, in *userService.AuthRequest) (*userService.UserIdRequest, error) {
+	return s.userClient.IsApiTokenValid(ctx, in)
 }
 
 func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
@@ -128,7 +122,7 @@ func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userS
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -145,7 +139,7 @@ func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.
 	if jwt == nil {
 		return nil, errors.New("unauthorized")
 	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{JwtToken: jwt[0]})
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
 		return nil, errors.New("unauthorized")
 	}
@@ -169,4 +163,43 @@ func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveI
 
 func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkillRequest) (*user.EmptyRequest, error) {
 	return s.userClient.RemoveSkill(ctx, in)
+}
+
+func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.ApiTokenRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.ApiTokenCreateRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return nil, errors.New("unauthorized")
+	}
+	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return nil, errors.New("unauthorized")
+	}
+	return s.userClient.ApiTokenRemoveRequest(ctx, in)
 }
