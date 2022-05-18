@@ -207,3 +207,11 @@ func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.
 	}
 	return s.userClient.ApiTokenRemoveRequest(ctx, in)
 }
+
+func (s *UserGatewayStruct) CreatePasswordRecoveryRequest(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
+	return s.userClient.CreatePasswordRecoveryRequest(ctx, in)
+}
+
+func (s *UserGatewayStruct) PasswordRecoveryRequest(ctx context.Context, in *user.NewPasswordRecoveryRequest) (*user.EmptyRequest, error) {
+	return s.userClient.PasswordRecoveryRequest(ctx, in)
+}
