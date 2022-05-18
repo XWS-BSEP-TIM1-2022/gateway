@@ -57,6 +57,10 @@ func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRe
 	return s.userClient.DeleteRequest(ctx, in)
 }
 
+func (s *UserGatewayStruct) ConfirmRegistration(ctx context.Context, in *user.ConfirmationRequest) (*user.ConfirmationResponse, error) {
+	return s.userClient.ConfirmRegistration(ctx, in)
+}
+
 func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.CredentialsRequest) (*user.LoginResponse, error) {
 	return s.userClient.LoginRequest(ctx, in)
 }
