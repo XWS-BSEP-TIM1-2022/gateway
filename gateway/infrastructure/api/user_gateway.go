@@ -215,3 +215,11 @@ func (s *UserGatewayStruct) CreatePasswordRecoveryRequest(ctx context.Context, i
 func (s *UserGatewayStruct) PasswordRecoveryRequest(ctx context.Context, in *user.NewPasswordRecoveryRequest) (*user.EmptyRequest, error) {
 	return s.userClient.PasswordRecoveryRequest(ctx, in)
 }
+
+func (s *UserGatewayStruct) PasswordlessLoginStart(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
+	return s.userClient.PasswordlessLoginStart(ctx, in)
+}
+
+func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.PasswordlessLoginRequest) (*user.LoginResponse, error) {
+	return s.userClient.PasswordlessLogin(ctx, in)
+}
