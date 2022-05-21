@@ -48,6 +48,10 @@ func (s *PostGatewayStruct) GetAllFromUserRequest(ctx context.Context, in *postS
 }
 
 func (s *PostGatewayStruct) CreateRequest(ctx context.Context, in *postService.PostRequest) (*postService.PostResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &postService.PostResponse{}, err
@@ -61,6 +65,10 @@ func (s *PostGatewayStruct) CreateRequest(ctx context.Context, in *postService.P
 }
 
 func (s *PostGatewayStruct) DeleteRequest(ctx context.Context, in *postService.PostIdRequest) (*postService.EmptyRequest, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &postService.EmptyRequest{}, err
@@ -95,6 +103,10 @@ func (s *PostGatewayStruct) GetAllCommentsFromPostRequest(ctx context.Context, i
 }
 
 func (s *PostGatewayStruct) CreateCommentRequest(ctx context.Context, in *postService.CommentRequest) (*postService.CommentResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &postService.CommentResponse{}, err
@@ -108,6 +120,10 @@ func (s *PostGatewayStruct) CreateCommentRequest(ctx context.Context, in *postSe
 }
 
 func (s *PostGatewayStruct) DeleteCommentRequest(ctx context.Context, in *postService.CommentIdRequest) (*postService.EmptyRequest, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &postService.EmptyRequest{}, err
@@ -141,6 +157,10 @@ func (s *PostGatewayStruct) GetAllReactionsFromPostRequest(ctx context.Context, 
 }
 
 func (s *PostGatewayStruct) CreateReactionRequest(ctx context.Context, in *postService.ReactionRequest) (*postService.ReactionResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return nil, err

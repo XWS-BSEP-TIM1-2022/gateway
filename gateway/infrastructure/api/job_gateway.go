@@ -35,6 +35,10 @@ func (s *JobGatewayStruct) GetAllRequest(ctx context.Context, in *jobService.Emp
 }
 
 func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserRequest) (*jobService.GetResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
 	if jwt == nil {
@@ -72,6 +76,10 @@ func (s *JobGatewayStruct) DeleteRequest(ctx context.Context, in *jobService.Job
 }
 
 func (s *JobGatewayStruct) SearchJobsRequest(ctx context.Context, in *jobService.SearchRequest) (*jobService.JobsResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	return s.jobClient.SearchJobsRequest(ctx, in)
 }
 

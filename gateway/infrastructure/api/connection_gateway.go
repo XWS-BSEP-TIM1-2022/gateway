@@ -27,6 +27,10 @@ func NewConnectionGateway(c *config.Config) *ConnectionGatewayStruct {
 }
 
 func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -40,6 +44,10 @@ func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *con
 }
 
 func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -53,6 +61,10 @@ func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *con
 }
 
 func (s *ConnectionGatewayStruct) RejectConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
