@@ -29,6 +29,15 @@ func (s *UserGatewayStruct) GetRequest(ctx context.Context, in *user.UserIdReque
 }
 
 func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyRequest) (*user.UsersResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.UsersResponse{}, err
+	}
+	err = s.roleHavePermission(role, "user_getAll")
+	if err != nil {
+		return &user.UsersResponse{}, err
+	}
+
 	return s.userClient.GetAllRequest(ctx, in)
 }
 
@@ -41,19 +50,28 @@ func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserR
 }
 
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.GetResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.GetResponse{}, err
+	}
+
 	return s.userClient.UpdateRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_delete")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.DeleteRequest(ctx, in)
 }
 
@@ -66,28 +84,28 @@ func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.Credentia
 }
 
 func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest) (*user.TFAResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.TFAResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_read")
+	if err != nil {
+		return &user.TFAResponse{}, err
+	}
+
 	return s.userClient.GetQR2FA(ctx, in)
 }
 
 func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) (*user.EmptyRequest, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.EmptyRequest{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.Enable2FA(ctx, in)
 }
 
@@ -96,15 +114,15 @@ func (s *UserGatewayStruct) Verify2FA(ctx context.Context, in *user.TFARequest) 
 }
 
 func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.EmptyRequest{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.Disable2FA(ctx, in)
 }
 
@@ -121,15 +139,15 @@ func (s *UserGatewayStruct) IsApiTokenValid(ctx context.Context, in *userService
 }
 
 func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.GetResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.GetResponse{}, err
+	}
+
 	return s.userClient.UpdatePasswordRequest(ctx, in)
 }
 
@@ -138,73 +156,118 @@ func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in
 }
 
 func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.NewExperienceResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.NewExperienceResponse{}, err
+	}
+
 	return s.userClient.PostExperienceRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *user.DeleteUsersExperienceRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.DeleteExperienceRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.AddUserSkill(ctx, in)
 }
 func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInterestRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.AddUserInterest(ctx, in)
 }
 
 func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveInterestRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.RemoveInterest(ctx, in)
 }
 
 func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkillRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.RemoveSkill(ctx, in)
 }
 
 func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.ApiTokenResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_read")
+	if err != nil {
+		return &user.ApiTokenResponse{}, err
+	}
+
 	return s.userClient.ApiTokenRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.ApiTokenResponse{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.ApiTokenResponse{}, err
+	}
+
 	return s.userClient.ApiTokenCreateRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	jwt := md.Get("Authorization")
-	if jwt == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		return nil, errors.New("unauthorized")
+		return &user.EmptyRequest{}, err
 	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
 	return s.userClient.ApiTokenRemoveRequest(ctx, in)
 }
 
@@ -222,4 +285,27 @@ func (s *UserGatewayStruct) PasswordlessLoginStart(ctx context.Context, in *user
 
 func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.PasswordlessLoginRequest) (*user.LoginResponse, error) {
 	return s.userClient.PasswordlessLogin(ctx, in)
+}
+
+func (s *UserGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return "", errors.New("unauthorized")
+	}
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return "", errors.New("unauthorized")
+	}
+
+	return role.UserRole, nil
+}
+
+func (s *UserGatewayStruct) roleHavePermission(role string, requiredPermission string) error {
+	permissions := s.config.RolePermissions[role]
+	if !contains(permissions, requiredPermission) {
+		return errors.New("unauthorized")
+	}
+
+	return nil
 }

@@ -45,13 +45,55 @@ func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserR
 		return nil, errors.New("unauthorized")
 	}
 	in.Job.UserId = userId.UserId
+
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &jobService.GetResponse{}, err
+	}
+	err = s.roleHavePermission(role, "job_write")
+	if err != nil {
+		return &jobService.GetResponse{}, err
+	}
+
 	return s.jobClient.PostRequest(ctx, in)
 }
 
 func (s *JobGatewayStruct) DeleteRequest(ctx context.Context, in *jobService.JobIdRequest) (*jobService.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &jobService.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "job_delete")
+	if err != nil {
+		return &jobService.EmptyRequest{}, err
+	}
+
 	return s.jobClient.DeleteRequest(ctx, in)
 }
 
 func (s *JobGatewayStruct) SearchJobsRequest(ctx context.Context, in *jobService.SearchRequest) (*jobService.JobsResponse, error) {
 	return s.jobClient.SearchJobsRequest(ctx, in)
+}
+
+func (s *JobGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	if jwt == nil {
+		return "", errors.New("unauthorized")
+	}
+	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
+	if err != nil {
+		return "", errors.New("unauthorized")
+	}
+
+	return role.UserRole, nil
+}
+
+func (s *JobGatewayStruct) roleHavePermission(role string, requiredPermission string) error {
+	permissions := s.config.RolePermissions[role]
+	if !contains(permissions, requiredPermission) {
+		return errors.New("unauthorized")
+	}
+
+	return nil
 }
