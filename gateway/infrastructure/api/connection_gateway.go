@@ -60,6 +60,23 @@ func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *con
 	return s.connectionClient.ApproveConnection(ctx, in)
 }
 
+func (s *ConnectionGatewayStruct) ApproveAllConnection(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.EmptyRequest, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "connection_write")
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+
+	return s.connectionClient.ApproveAllConnection(ctx, in)
+}
+
 func (s *ConnectionGatewayStruct) RejectConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
 	err := checkValue(in.String())
 	if err != nil {

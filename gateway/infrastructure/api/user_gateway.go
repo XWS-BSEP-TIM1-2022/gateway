@@ -356,6 +356,19 @@ func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.Pass
 	return s.userClient.PasswordlessLogin(ctx, in)
 }
 
+func (s *UserGatewayStruct) ChangeProfilePrivacy(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.EmptyRequest{}, err
+	}
+
+	return s.userClient.ChangeProfilePrivacy(ctx, in)
+}
+
 func (s *UserGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
