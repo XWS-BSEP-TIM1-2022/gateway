@@ -172,6 +172,57 @@ func (s *ConnectionGatewayStruct) GetAllPendingConnectionsByUserId(ctx context.C
 	return s.connectionClient.GetAllPendingConnectionsByUserId(ctx, in)
 }
 
+func (s *ConnectionGatewayStruct) BlockUser(ctx context.Context, in *connectionService.BlockUserRequest) (*connectionService.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "block_write")
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+
+	return s.connectionClient.BlockUser(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) UnblockUser(ctx context.Context, in *connectionService.BlockUserRequest) (*connectionService.EmptyRequest, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+	err = s.roleHavePermission(role, "block_write")
+	if err != nil {
+		return &connectionService.EmptyRequest{}, err
+	}
+
+	return s.connectionClient.UnblockUser(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) IsBlocked(ctx context.Context, in *connectionService.Block) (*connectionService.IsBlockedResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.IsBlockedResponse{}, err
+	}
+	err = s.roleHavePermission(role, "block_read")
+	if err != nil {
+		return &connectionService.IsBlockedResponse{}, err
+	}
+
+	return s.connectionClient.IsBlocked(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) IsBlockedAny(ctx context.Context, in *connectionService.Block) (*connectionService.IsBlockedResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.IsBlockedResponse{}, err
+	}
+	err = s.roleHavePermission(role, "block_read")
+	if err != nil {
+		return &connectionService.IsBlockedResponse{}, err
+	}
+	return s.connectionClient.IsBlockedAny(ctx, in)
+}
+
 func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
