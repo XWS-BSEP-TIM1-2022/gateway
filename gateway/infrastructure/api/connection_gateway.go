@@ -223,6 +223,42 @@ func (s *ConnectionGatewayStruct) IsBlockedAny(ctx context.Context, in *connecti
 	return s.connectionClient.IsBlockedAny(ctx, in)
 }
 
+func (s *ConnectionGatewayStruct) Blocked(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.BlockedResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	err = s.roleHavePermission(role, "block_read")
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	return s.connectionClient.Blocked(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) BlockedBy(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.BlockedResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	err = s.roleHavePermission(role, "block_read")
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	return s.connectionClient.BlockedBy(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) BlockedAny(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.BlockedResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	err = s.roleHavePermission(role, "block_read")
+	if err != nil {
+		return &connectionService.BlockedResponse{}, err
+	}
+	return s.connectionClient.BlockedAny(ctx, in)
+}
+
 func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
