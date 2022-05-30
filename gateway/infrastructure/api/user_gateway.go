@@ -8,6 +8,7 @@ import (
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
+	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/token"
 	"google.golang.org/grpc/metadata"
 	"regexp"
 )
@@ -152,6 +153,8 @@ func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdReque
 }
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
+	in.UserId = getUserIdFromJwt(ctx)
+
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -398,4 +401,18 @@ func checkValue(value string) error {
 		return errors.New("forbidden stuff in input")
 	}
 	return nil
+}
+
+func getUserIdFromJwt(ctx context.Context) string {
+	md, _ := metadata.FromIncomingContext(ctx)
+	jwt := md.Get("Authorization")
+	retVal := ""
+	if jwt != nil {
+		var err error
+		retVal, err = token.NewJwtManagerDislinkt(0).GetUserIdFromToken(jwt[0])
+		if err != nil {
+			retVal = ""
+		}
+	}
+	return retVal
 }

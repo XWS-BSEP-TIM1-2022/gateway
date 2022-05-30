@@ -27,6 +27,7 @@ func NewPostGateway(c *config.Config) *PostGatewayStruct {
 }
 
 func (s *PostGatewayStruct) GetRequest(ctx context.Context, in *postService.PostIdRequest) (*postService.PostResponse, error) {
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.GetRequest(ctx, in)
 }
 
@@ -44,6 +45,7 @@ func (s *PostGatewayStruct) GetAllRequest(ctx context.Context, in *postService.E
 }
 
 func (s *PostGatewayStruct) GetAllFromUserRequest(ctx context.Context, in *postService.UserPostsRequest) (*postService.PostsResponse, error) {
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.GetAllFromUserRequest(ctx, in)
 }
 
@@ -78,10 +80,13 @@ func (s *PostGatewayStruct) DeleteRequest(ctx context.Context, in *postService.P
 		return &postService.EmptyRequest{}, err
 	}
 
+	in.LoggedUserId = getUserIdFromJwt(ctx)
+
 	return s.postClient.DeleteRequest(ctx, in)
 }
 
 func (s *PostGatewayStruct) GetCommentRequest(ctx context.Context, in *postService.CommentIdRequest) (*postService.CommentResponse, error) {
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.GetCommentRequest(ctx, in)
 }
 
@@ -99,6 +104,7 @@ func (s *PostGatewayStruct) GetAllCommentsRequest(ctx context.Context, in *postS
 }
 
 func (s *PostGatewayStruct) GetAllCommentsFromPostRequest(ctx context.Context, in *postService.PostCommentsRequest) (*postService.CommentsResponse, error) {
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.GetAllCommentsFromPostRequest(ctx, in)
 }
 
@@ -115,6 +121,7 @@ func (s *PostGatewayStruct) CreateCommentRequest(ctx context.Context, in *postSe
 	if err != nil {
 		return &postService.CommentResponse{}, err
 	}
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 
 	return s.postClient.CreateCommentRequest(ctx, in)
 }
@@ -132,10 +139,12 @@ func (s *PostGatewayStruct) DeleteCommentRequest(ctx context.Context, in *postSe
 	if err != nil {
 		return &postService.EmptyRequest{}, err
 	}
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.DeleteCommentRequest(ctx, in)
 }
 
 func (s *PostGatewayStruct) GetReactionRequest(ctx context.Context, in *postService.ReactionIdRequest) (*postService.ReactionResponse, error) {
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 	return s.postClient.GetReactionRequest(ctx, in)
 }
 
@@ -169,6 +178,7 @@ func (s *PostGatewayStruct) CreateReactionRequest(ctx context.Context, in *postS
 	if err != nil {
 		return nil, err
 	}
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 
 	return s.postClient.CreateReactionRequest(ctx, in)
 }
@@ -182,6 +192,7 @@ func (s *PostGatewayStruct) DeleteReactionRequest(ctx context.Context, in *postS
 	if err != nil {
 		return nil, err
 	}
+	in.LoggedUserId = getUserIdFromJwt(ctx)
 
 	return s.postClient.DeleteReactionRequest(ctx, in)
 }
