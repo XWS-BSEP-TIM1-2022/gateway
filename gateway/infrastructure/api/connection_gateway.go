@@ -60,6 +60,19 @@ func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *con
 	return s.connectionClient.ApproveConnection(ctx, in)
 }
 
+func (s *ConnectionGatewayStruct) GetConnection(ctx context.Context, in *connectionService.Connection) (*connectionService.Connection, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.Connection{}, err
+	}
+	err = s.roleHavePermission(role, "connection_read")
+	if err != nil {
+		return &connectionService.Connection{}, err
+	}
+
+	return s.connectionClient.GetConnection(ctx, in)
+}
+
 func (s *ConnectionGatewayStruct) ApproveAllConnection(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.EmptyRequest, error) {
 	err := checkValue(in.String())
 	if err != nil {
@@ -257,6 +270,45 @@ func (s *ConnectionGatewayStruct) BlockedAny(ctx context.Context, in *connection
 		return &connectionService.BlockedResponse{}, err
 	}
 	return s.connectionClient.BlockedAny(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) ChangeMessageNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+	err = s.roleHavePermission(role, "connection_write")
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+
+	return s.connectionClient.ChangeMessageNotification(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) ChangePostNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+	err = s.roleHavePermission(role, "connection_write")
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+
+	return s.connectionClient.ChangePostNotification(ctx, in)
+}
+
+func (s *ConnectionGatewayStruct) ChangeCommentNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+	err = s.roleHavePermission(role, "connection_write")
+	if err != nil {
+		return &connectionService.UserConnectionResponse{}, err
+	}
+
+	return s.connectionClient.ChangeCommentNotification(ctx, in)
 }
 
 func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
