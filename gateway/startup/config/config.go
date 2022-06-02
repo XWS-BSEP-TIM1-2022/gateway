@@ -15,6 +15,8 @@ type Config struct {
 	ConnectionServicePort string
 	JobServiceHost        string
 	JobServicePort        string
+	MessageServiceHost    string
+	MessageServicePort    string
 	RolePermissions       map[string][]string
 }
 
@@ -30,11 +32,13 @@ func NewConfig() *Config {
 		ConnectionServicePort: getEnv("CONNECTION_SERVICE_PORT", "8087"),
 		JobServiceHost:        getEnv("JOB_SERVICE_HOST", "localhost"),
 		JobServicePort:        getEnv("JOB_SERVICE_PORT", "8088"),
+		MessageServiceHost:    getEnv("MESSAGE_SERVICE_HOST", "localhost"),
+		MessageServicePort:    getEnv("MESSAGE_SERVICE_PORT", "8089"),
 		CertificatePath:       getEnv("CERTIFICATE_PATH", "certificates/dislinkt.cer"),
 		CertificateKeyPath:    getEnv("CERTIFICATE_KEY_PATH", "certificates/dislinkt_private_key.key"),
 		RolePermissions: map[string][]string{
 			"ADMIN": []string{"user_getAll", "user_read", "user_write", "user_delete", "post_read", "post_write", "post_delete", "post_getAll", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete"},
-			"USER":  []string{"post_read", "user_read", "user_write", "post_write", "post_delete", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete", "block_write", "block_read"},
+			"USER":  []string{"post_read", "user_read", "user_write", "post_write", "post_delete", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete", "block_write", "block_read", "notification_read"},
 		},
 	}
 }

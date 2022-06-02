@@ -52,7 +52,7 @@ func (server *Server) CloseTracer() error {
 	return server.closer.Close()
 }
 
-func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatewayS *api.PostGatewayStruct, connectionGatewayS *api.ConnectionGatewayStruct, jobGatewayS *api.JobGatewayStruct) {
+func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatewayS *api.PostGatewayStruct, connectionGatewayS *api.ConnectionGatewayStruct, jobGatewayS *api.JobGatewayStruct, messageGatewayS *api.MessageGatewayStruct) {
 	// Create a listener on TCP port
 	defer server.CloseTracer()
 
@@ -74,6 +74,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 	postService.RegisterPostServiceServer(s, postGatewayS)
 	connectionService.RegisterConnectionServiceServer(s, connectionGatewayS)
 	jobService.RegisterJobServiceServer(s, jobGatewayS)
+	//messageService.RegisterMessageServiceServer(s, messageGatewayS)
 	// Serve gRPC server
 	log.Println(fmt.Sprintf("Serving gRPC on localhost:%s", server.Config.GrpcPort))
 	go func() {
@@ -133,10 +134,10 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 }
 
 func (server *Server) Start() {
-	userGateway, postGateway, connectionGateway, jobGateway := server.initHandlers()
-	server.StartServer(userGateway, postGateway, connectionGateway, jobGateway)
+	userGateway, postGateway, connectionGateway, jobGateway, messageGateway := server.initHandlers()
+	server.StartServer(userGateway, postGateway, connectionGateway, jobGateway, messageGateway)
 }
 
-func (server *Server) initHandlers() (*api.UserGatewayStruct, *api.PostGatewayStruct, *api.ConnectionGatewayStruct, *api.JobGatewayStruct) {
-	return api.NewUserGateway(server.Config), api.NewPostGateway(server.Config), api.NewConnectionGateway(server.Config), api.NewJobGateway(server.Config)
+func (server *Server) initHandlers() (*api.UserGatewayStruct, *api.PostGatewayStruct, *api.ConnectionGatewayStruct, *api.JobGatewayStruct, *api.MessageGatewayStruct) {
+	return api.NewUserGateway(server.Config), api.NewPostGateway(server.Config), api.NewConnectionGateway(server.Config), api.NewJobGateway(server.Config), api.NewMessageGateway(server.Config)
 }
