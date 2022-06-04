@@ -50,15 +50,6 @@ func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserR
 	}
 	in.Job.UserId = userId.UserId
 
-	role, err := s.isUserAuthenticated(ctx)
-	if err != nil {
-		return &jobService.GetResponse{}, err
-	}
-	err = s.roleHavePermission(role, "job_write")
-	if err != nil {
-		return &jobService.GetResponse{}, err
-	}
-
 	return s.jobClient.PostRequest(ctx, in)
 }
 
