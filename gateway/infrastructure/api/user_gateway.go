@@ -195,6 +195,22 @@ func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userS
 	return s.userClient.UpdatePasswordRequest(ctx, in)
 }
 
+func (s *UserGatewayStruct) ChangeUsernameRequest(ctx context.Context, in *userService.NewUsernameRequest) (*user.GetResponse, error) {
+	err := checkValue(in.String())
+	if err != nil {
+		return nil, err
+	}
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &user.GetResponse{}, err
+	}
+	err = s.roleHavePermission(role, "user_write")
+	if err != nil {
+		return &user.GetResponse{}, err
+	}
+	return s.userClient.ChangeUsernameRequest(ctx, in)
+}
+
 func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in *userService.ExperienceRequest) (*user.ExperienceResponse, error) {
 	return s.userClient.GetAllUsersExperienceRequest(ctx, in)
 }
