@@ -29,14 +29,17 @@ func NewConnectionGateway(c *config.Config) *ConnectionGatewayStruct {
 func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Error("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Error("User is not authenticated")
 		return &connectionService.UserConnectionResponse{}, err
 	}
 	err = s.roleHavePermission(role, "connection_write")
 	if err != nil {
+		Log.Error("Current user role dont have valid permission")
 		return &connectionService.UserConnectionResponse{}, err
 	}
 

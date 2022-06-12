@@ -9,6 +9,7 @@ import (
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/services"
 	"github.com/XWS-BSEP-TIM1-2022/dislinkt/util/token"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/metadata"
 	"regexp"
 )
@@ -19,6 +20,8 @@ type UserGatewayStruct struct {
 	userClient userService.UserServiceClient
 }
 
+var Log = logrus.New()
+
 func NewUserGateway(c *config.Config) *UserGatewayStruct {
 	return &UserGatewayStruct{
 		config:     c,
@@ -27,16 +30,20 @@ func NewUserGateway(c *config.Config) *UserGatewayStruct {
 }
 
 func (s *UserGatewayStruct) GetRequest(ctx context.Context, in *user.UserIdRequest) (*user.GetResponse, error) {
+	Log.Info("Getting users data...")
 	return s.userClient.GetRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyRequest) (*user.UsersResponse, error) {
+	Log.Info("Getting all requests")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.UsersResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_getAll")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.UsersResponse{}, err
 	}
 
@@ -44,32 +51,40 @@ func (s *UserGatewayStruct) GetAllRequest(ctx context.Context, in *user.EmptyReq
 }
 
 func (s *UserGatewayStruct) PostRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
+	Log.Info("Creating new user...")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.PostRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
+	Log.Info("Creating new admin...")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.PostAdminRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
+	Log.Info("Updating existing user")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.GetResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.GetResponse{}, err
 	}
 
@@ -77,12 +92,15 @@ func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequ
 }
 
 func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	Log.Info("Deleting existing user...")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_delete")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -90,28 +108,35 @@ func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRe
 }
 
 func (s *UserGatewayStruct) ConfirmRegistration(ctx context.Context, in *user.ConfirmationRequest) (*user.ConfirmationResponse, error) {
+	Log.Info("Confirm registration")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.ConfirmRegistration(ctx, in)
 }
 
 func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.CredentialsRequest) (*user.LoginResponse, error) {
+	Log.Info("Login request")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.LoginRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest) (*user.TFAResponse, error) {
+	Log.Info("Getting QR2FA")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.TFAResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_read")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.TFAResponse{}, err
 	}
 
@@ -119,16 +144,20 @@ func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest
 }
 
 func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) (*user.EmptyRequest, error) {
+	Log.Info("Enabling 2FA")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -136,16 +165,20 @@ func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) 
 }
 
 func (s *UserGatewayStruct) Verify2FA(ctx context.Context, in *user.TFARequest) (*user.LoginResponse, error) {
+	Log.Info("Verifying 2FA")
 	return s.userClient.Verify2FA(ctx, in)
 }
 
 func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	Log.Info("Disabling 2FA")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -153,42 +186,52 @@ func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdReque
 }
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
+	Log.Info("Searching users")
 	in.UserId = getUserIdFromJwt(ctx)
 
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.SearchUsersRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) IsUserAuthenticated(ctx context.Context, in *userService.AuthRequest) (*userService.AuthResponse, error) {
+	Log.Info("Checking is user authenticated")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.IsUserAuthenticated(ctx, in)
 }
 
 func (s *UserGatewayStruct) IsApiTokenValid(ctx context.Context, in *userService.AuthRequest) (*userService.UserIdRequest, error) {
+	Log.Info("Checking is api token valid")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.IsApiTokenValid(ctx, in)
 }
 
 func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
+	Log.Info("Updating password")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.GetResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.GetResponse{}, err
 	}
 
@@ -196,36 +239,45 @@ func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userS
 }
 
 func (s *UserGatewayStruct) ChangeUsernameRequest(ctx context.Context, in *userService.NewUsernameRequest) (*user.GetResponse, error) {
+	Log.Info("Changing username")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.GetResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.GetResponse{}, err
 	}
 	return s.userClient.ChangeUsernameRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in *userService.ExperienceRequest) (*user.ExperienceResponse, error) {
+	Log.Info("Getting all users experience")
 	return s.userClient.GetAllUsersExperienceRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
+	Log.Info("Adding new experience")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.NewExperienceResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.NewExperienceResponse{}, err
 	}
 
@@ -233,12 +285,15 @@ func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *user.DeleteUsersExperienceRequest) (*user.EmptyRequest, error) {
+	Log.Info("Deleting users experience")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -246,32 +301,40 @@ func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *use
 }
 
 func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillRequest) (*user.EmptyRequest, error) {
+	Log.Info("Adding users skill")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
 	return s.userClient.AddUserSkill(ctx, in)
 }
 func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInterestRequest) (*user.EmptyRequest, error) {
+	Log.Info("Adding new users interest")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -279,12 +342,15 @@ func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInt
 }
 
 func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveInterestRequest) (*user.EmptyRequest, error) {
+	Log.Info("Removing users interest")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -292,12 +358,15 @@ func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveI
 }
 
 func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkillRequest) (*user.EmptyRequest, error) {
+	Log.Info("Removing users skill")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -305,12 +374,15 @@ func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkil
 }
 
 func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
+	Log.Info("Get api token")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.ApiTokenResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_read")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.ApiTokenResponse{}, err
 	}
 
@@ -318,12 +390,15 @@ func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserId
 }
 
 func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
+	Log.Info("Create api token")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.ApiTokenResponse{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.ApiTokenResponse{}, err
 	}
 
@@ -331,12 +406,15 @@ func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	Log.Info("Removing api token...")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -344,44 +422,55 @@ func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) CreatePasswordRecoveryRequest(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
+	Log.Info("Stating password recovering...")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.CreatePasswordRecoveryRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PasswordRecoveryRequest(ctx context.Context, in *user.NewPasswordRecoveryRequest) (*user.EmptyRequest, error) {
+	Log.Info("Password recovering...")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.PasswordRecoveryRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PasswordlessLoginStart(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
+	Log.Info("Stating password recovering...")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.PasswordlessLoginStart(ctx, in)
 }
 
 func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.PasswordlessLoginRequest) (*user.LoginResponse, error) {
+	Log.Info("Passwordless login")
 	err := checkValue(in.String())
 	if err != nil {
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	return s.userClient.PasswordlessLogin(ctx, in)
 }
 
 func (s *UserGatewayStruct) ChangeProfilePrivacy(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
+	Log.Info("Change profile privacy")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return &user.EmptyRequest{}, err
 	}
 	err = s.roleHavePermission(role, "user_write")
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return &user.EmptyRequest{}, err
 	}
 
@@ -392,10 +481,12 @@ func (s *UserGatewayStruct) isUserAuthenticated(ctx context.Context) (string, er
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
 	if jwt == nil {
+		Log.Warn("User is not authenticated")
 		return "", errors.New("unauthorized")
 	}
 	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
+		Log.Warn("User doesn't have permission to get requests")
 		return "", errors.New("unauthorized")
 	}
 
