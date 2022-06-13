@@ -27,14 +27,17 @@ func NewJobGateway(c *config.Config) *JobGatewayStruct {
 }
 
 func (s *JobGatewayStruct) GetRequest(ctx context.Context, in *jobService.JobIdRequest) (*jobService.GetResponse, error) {
+	Log.Info("Getting job with id: " + in.JobId)
 	return s.jobClient.GetRequest(ctx, in)
 }
 
 func (s *JobGatewayStruct) GetAllRequest(ctx context.Context, in *jobService.EmptyRequest) (*jobService.JobsResponse, error) {
+	Log.Info("Getting all jobs")
 	return s.jobClient.GetAllRequest(ctx, in)
 }
 
 func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserRequest) (*jobService.GetResponse, error) {
+	Log.Info("Creating new job for user with id:" + in.Job.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -42,10 +45,12 @@ func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserR
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
 	if jwt == nil {
+		Log.Warn("User dont have jwt in request")
 		return nil, errors.New("unauthorized")
 	}
 	userId, err := s.userClient.IsApiTokenValid(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return nil, errors.New("unauthorized")
 	}
 	in.Job.UserId = userId.UserId
@@ -54,6 +59,7 @@ func (s *JobGatewayStruct) PostRequest(ctx context.Context, in *jobService.UserR
 }
 
 func (s *JobGatewayStruct) DeleteRequest(ctx context.Context, in *jobService.JobIdRequest) (*jobService.EmptyRequest, error) {
+	Log.Info("Deleting job with id:" + in.JobId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &jobService.EmptyRequest{}, err
@@ -67,6 +73,7 @@ func (s *JobGatewayStruct) DeleteRequest(ctx context.Context, in *jobService.Job
 }
 
 func (s *JobGatewayStruct) SearchJobsRequest(ctx context.Context, in *jobService.SearchRequest) (*jobService.JobsResponse, error) {
+	Log.Info("Searching for jobs...")
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -78,10 +85,12 @@ func (s *JobGatewayStruct) isUserAuthenticated(ctx context.Context) (string, err
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
 	if jwt == nil {
+		Log.Warn("User dont have jwt in request")
 		return "", errors.New("unauthorized")
 	}
 	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return "", errors.New("unauthorized")
 	}
 
@@ -91,6 +100,7 @@ func (s *JobGatewayStruct) isUserAuthenticated(ctx context.Context) (string, err
 func (s *JobGatewayStruct) roleHavePermission(role string, requiredPermission string) error {
 	permissions := s.config.RolePermissions[role]
 	if !contains(permissions, requiredPermission) {
+		Log.Warn("User doesn't have permission to get requests")
 		return errors.New("unauthorized")
 	}
 

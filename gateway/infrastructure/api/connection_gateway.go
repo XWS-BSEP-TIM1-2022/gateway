@@ -27,19 +27,20 @@ func NewConnectionGateway(c *config.Config) *ConnectionGatewayStruct {
 }
 
 func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Creating new connection for user with id: " + in.Connection.UserId + " with user with id: " + in.Connection.ConnectedUserId)
 	err := checkValue(in.String())
 	if err != nil {
-		Log.Error("Input possibly contains malicious data")
+		Log.Warn("Input possibly contains malicious data")
 		return nil, err
 	}
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
-		Log.Error("User is not authenticated")
+		Log.Warn("User is not authenticated")
 		return &connectionService.UserConnectionResponse{}, err
 	}
 	err = s.roleHavePermission(role, "connection_write")
 	if err != nil {
-		Log.Error("Current user role dont have valid permission")
+		Log.Warn("Current user role dont have valid permission")
 		return &connectionService.UserConnectionResponse{}, err
 	}
 
@@ -47,6 +48,7 @@ func (s *ConnectionGatewayStruct) NewUserConnection(ctx context.Context, in *con
 }
 
 func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Approving connection between users with ids: " + in.Connection.UserId + "---" + in.Connection.ConnectedUserId)
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -64,6 +66,7 @@ func (s *ConnectionGatewayStruct) ApproveConnection(ctx context.Context, in *con
 }
 
 func (s *ConnectionGatewayStruct) GetConnection(ctx context.Context, in *connectionService.Connection) (*connectionService.Connection, error) {
+	Log.Info("Getting connection between users with ids: " + in.UserId + "---" + in.ConnectedUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.Connection{}, err
@@ -77,6 +80,7 @@ func (s *ConnectionGatewayStruct) GetConnection(ctx context.Context, in *connect
 }
 
 func (s *ConnectionGatewayStruct) ApproveAllConnection(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.EmptyRequest, error) {
+	Log.Info("Approving all connections for user with id: " + in.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -94,6 +98,7 @@ func (s *ConnectionGatewayStruct) ApproveAllConnection(ctx context.Context, in *
 }
 
 func (s *ConnectionGatewayStruct) RejectConnection(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Getting connection between users with ids: " + in.Connection.UserId + "---" + in.Connection.ConnectedUserId)
 	err := checkValue(in.String())
 	if err != nil {
 		return nil, err
@@ -111,6 +116,7 @@ func (s *ConnectionGatewayStruct) RejectConnection(ctx context.Context, in *conn
 }
 
 func (s *ConnectionGatewayStruct) DeleteConnection(ctx context.Context, in *connectionService.Connection) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Delete connection between users with ids: " + in.UserId + "---" + in.ConnectedUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -124,6 +130,7 @@ func (s *ConnectionGatewayStruct) DeleteConnection(ctx context.Context, in *conn
 }
 
 func (s *ConnectionGatewayStruct) GetAllConnections(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.AllConnectionResponse, error) {
+	Log.Info("Getting all connections")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.AllConnectionResponse{}, err
@@ -137,6 +144,7 @@ func (s *ConnectionGatewayStruct) GetAllConnections(ctx context.Context, in *con
 }
 
 func (s *ConnectionGatewayStruct) GetFollowings(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.AllConnectionResponse, error) {
+	Log.Info("Getting all following for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.AllConnectionResponse{}, err
@@ -150,6 +158,7 @@ func (s *ConnectionGatewayStruct) GetFollowings(ctx context.Context, in *connect
 }
 
 func (s *ConnectionGatewayStruct) GetFollowers(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.AllConnectionResponse, error) {
+	Log.Info("Getting all followers for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.AllConnectionResponse{}, err
@@ -163,6 +172,7 @@ func (s *ConnectionGatewayStruct) GetFollowers(ctx context.Context, in *connecti
 }
 
 func (s *ConnectionGatewayStruct) GetAllRequestConnectionsByUserId(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.AllConnectionResponse, error) {
+	Log.Info("Getting connection request for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.AllConnectionResponse{}, err
@@ -176,6 +186,7 @@ func (s *ConnectionGatewayStruct) GetAllRequestConnectionsByUserId(ctx context.C
 }
 
 func (s *ConnectionGatewayStruct) GetAllPendingConnectionsByUserId(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.AllConnectionResponse, error) {
+	Log.Info("Getting all pending request for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.AllConnectionResponse{}, err
@@ -189,6 +200,7 @@ func (s *ConnectionGatewayStruct) GetAllPendingConnectionsByUserId(ctx context.C
 }
 
 func (s *ConnectionGatewayStruct) BlockUser(ctx context.Context, in *connectionService.BlockUserRequest) (*connectionService.EmptyRequest, error) {
+	Log.Info("User with id: " + in.Block.UserId + "block user with id: " + in.Block.BlockUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.EmptyRequest{}, err
@@ -202,6 +214,7 @@ func (s *ConnectionGatewayStruct) BlockUser(ctx context.Context, in *connectionS
 }
 
 func (s *ConnectionGatewayStruct) UnblockUser(ctx context.Context, in *connectionService.BlockUserRequest) (*connectionService.EmptyRequest, error) {
+	Log.Info("User with id: " + in.Block.UserId + "unblock user with id: " + in.Block.BlockUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.EmptyRequest{}, err
@@ -215,6 +228,7 @@ func (s *ConnectionGatewayStruct) UnblockUser(ctx context.Context, in *connectio
 }
 
 func (s *ConnectionGatewayStruct) IsBlocked(ctx context.Context, in *connectionService.Block) (*connectionService.IsBlockedResponse, error) {
+	Log.Info("User with id: " + in.UserId + "check is user with id: " + in.BlockUserId + " blocked")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.IsBlockedResponse{}, err
@@ -240,6 +254,7 @@ func (s *ConnectionGatewayStruct) IsBlockedAny(ctx context.Context, in *connecti
 }
 
 func (s *ConnectionGatewayStruct) Blocked(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.BlockedResponse, error) {
+	Log.Info("Check is user with id:" + in.UserId + " blocked")
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.BlockedResponse{}, err
@@ -252,6 +267,7 @@ func (s *ConnectionGatewayStruct) Blocked(ctx context.Context, in *connectionSer
 }
 
 func (s *ConnectionGatewayStruct) BlockedBy(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.BlockedResponse, error) {
+	Log.Info("Checking is current user blocked by user with id:" + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.BlockedResponse{}, err
@@ -276,6 +292,7 @@ func (s *ConnectionGatewayStruct) BlockedAny(ctx context.Context, in *connection
 }
 
 func (s *ConnectionGatewayStruct) ChangeMessageNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Changing message notification with user id: " + in.Connection.UserId + " for user with id:" + in.Connection.ConnectedUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -289,6 +306,7 @@ func (s *ConnectionGatewayStruct) ChangeMessageNotification(ctx context.Context,
 }
 
 func (s *ConnectionGatewayStruct) ChangePostNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Changing post notification with user id: " + in.Connection.UserId + " for user with id:" + in.Connection.ConnectedUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -302,6 +320,7 @@ func (s *ConnectionGatewayStruct) ChangePostNotification(ctx context.Context, in
 }
 
 func (s *ConnectionGatewayStruct) ChangeCommentNotification(ctx context.Context, in *connectionService.UserConnectionRequest) (*connectionService.UserConnectionResponse, error) {
+	Log.Info("Changing comment notification with user id: " + in.Connection.UserId + " for user with id:" + in.Connection.ConnectedUserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		return &connectionService.UserConnectionResponse{}, err
@@ -318,10 +337,12 @@ func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (stri
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")
 	if jwt == nil {
+		Log.Warn("User dont have jwt in request")
 		return "", errors.New("unauthorized")
 	}
 	role, err := s.userClient.IsUserAuthenticated(ctx, &userService.AuthRequest{Token: jwt[0]})
 	if err != nil {
+		Log.Warn("User is not authenticated")
 		return "", errors.New("unauthorized")
 	}
 
@@ -331,6 +352,7 @@ func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (stri
 func (s *ConnectionGatewayStruct) roleHavePermission(role string, requiredPermission string) error {
 	permissions := s.config.RolePermissions[role]
 	if !contains(permissions, requiredPermission) {
+		Log.Warn("User doesn't have permission to get requests")
 		return errors.New("unauthorized")
 	}
 

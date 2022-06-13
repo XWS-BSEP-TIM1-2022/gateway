@@ -71,7 +71,7 @@ func (s *UserGatewayStruct) PostAdminRequest(ctx context.Context, in *user.UserR
 }
 
 func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequest) (*user.GetResponse, error) {
-	Log.Info("Updating existing user")
+	Log.Info("Updating existing user with id: " + in.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -92,7 +92,7 @@ func (s *UserGatewayStruct) UpdateRequest(ctx context.Context, in *user.UserRequ
 }
 
 func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	Log.Info("Deleting existing user...")
+	Log.Info("Deleting existing user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -108,7 +108,7 @@ func (s *UserGatewayStruct) DeleteRequest(ctx context.Context, in *user.UserIdRe
 }
 
 func (s *UserGatewayStruct) ConfirmRegistration(ctx context.Context, in *user.ConfirmationRequest) (*user.ConfirmationResponse, error) {
-	Log.Info("Confirm registration")
+	Log.Info("Confirm registration of id: " + in.ConfirmationId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -118,7 +118,7 @@ func (s *UserGatewayStruct) ConfirmRegistration(ctx context.Context, in *user.Co
 }
 
 func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.CredentialsRequest) (*user.LoginResponse, error) {
-	Log.Info("Login request")
+	Log.Info("Login request for user with user name with: " + in.Credentials.Username)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -128,7 +128,7 @@ func (s *UserGatewayStruct) LoginRequest(ctx context.Context, in *user.Credentia
 }
 
 func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest) (*user.TFAResponse, error) {
-	Log.Info("Getting QR2FA")
+	Log.Info("Getting QR2FA for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -144,7 +144,7 @@ func (s *UserGatewayStruct) GetQR2FA(ctx context.Context, in *user.UserIdRequest
 }
 
 func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) (*user.EmptyRequest, error) {
-	Log.Info("Enabling 2FA")
+	Log.Info("Enabling 2FA for user with id:" + in.Tfa.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -165,12 +165,12 @@ func (s *UserGatewayStruct) Enable2FA(ctx context.Context, in *user.TFARequest) 
 }
 
 func (s *UserGatewayStruct) Verify2FA(ctx context.Context, in *user.TFARequest) (*user.LoginResponse, error) {
-	Log.Info("Verifying 2FA")
+	Log.Info("Verifying 2FA for user with id: " + in.Tfa.UserId)
 	return s.userClient.Verify2FA(ctx, in)
 }
 
 func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	Log.Info("Disabling 2FA")
+	Log.Info("Disabling 2FA for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -186,7 +186,7 @@ func (s *UserGatewayStruct) Disable2FA(ctx context.Context, in *user.UserIdReque
 }
 
 func (s *UserGatewayStruct) SearchUsersRequest(ctx context.Context, in *user.SearchRequest) (*user.UsersResponse, error) {
-	Log.Info("Searching users")
+	Log.Info("Searching users from user with id: " + in.UserId)
 	in.UserId = getUserIdFromJwt(ctx)
 
 	err := checkValue(in.String())
@@ -218,7 +218,7 @@ func (s *UserGatewayStruct) IsApiTokenValid(ctx context.Context, in *userService
 }
 
 func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userService.NewPasswordRequest) (*user.GetResponse, error) {
-	Log.Info("Updating password")
+	Log.Info("Updating password for user with id: " + in.NewPassword.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -239,6 +239,7 @@ func (s *UserGatewayStruct) UpdatePasswordRequest(ctx context.Context, in *userS
 }
 
 func (s *UserGatewayStruct) ChangeUsernameRequest(ctx context.Context, in *userService.NewUsernameRequest) (*user.GetResponse, error) {
+	Log.Info("Changing username for user with id: " + in.NewUsername.UserId)
 	Log.Info("Changing username")
 	err := checkValue(in.String())
 	if err != nil {
@@ -259,12 +260,12 @@ func (s *UserGatewayStruct) ChangeUsernameRequest(ctx context.Context, in *userS
 }
 
 func (s *UserGatewayStruct) GetAllUsersExperienceRequest(ctx context.Context, in *userService.ExperienceRequest) (*user.ExperienceResponse, error) {
-	Log.Info("Getting all users experience")
+	Log.Info("Getting all users experience with id:" + in.UserId)
 	return s.userClient.GetAllUsersExperienceRequest(ctx, in)
 }
 
 func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.NewExperienceRequest) (*user.NewExperienceResponse, error) {
-	Log.Info("Adding new experience")
+	Log.Info("Adding new experience to user with id: " + in.Experience.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -285,7 +286,7 @@ func (s *UserGatewayStruct) PostExperienceRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *user.DeleteUsersExperienceRequest) (*user.EmptyRequest, error) {
-	Log.Info("Deleting users experience")
+	Log.Info("Deleting users experience with id:" + in.ExperienceId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -301,7 +302,7 @@ func (s *UserGatewayStruct) DeleteExperienceRequest(ctx context.Context, in *use
 }
 
 func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillRequest) (*user.EmptyRequest, error) {
-	Log.Info("Adding users skill")
+	Log.Info("Adding users skill for user with id: " + in.NewSkill.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -321,7 +322,7 @@ func (s *UserGatewayStruct) AddUserSkill(ctx context.Context, in *user.NewSkillR
 	return s.userClient.AddUserSkill(ctx, in)
 }
 func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInterestRequest) (*user.EmptyRequest, error) {
-	Log.Info("Adding new users interest")
+	Log.Info("Adding new users interest for user with id: " + in.NewInterest.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -342,7 +343,7 @@ func (s *UserGatewayStruct) AddUserInterest(ctx context.Context, in *user.NewInt
 }
 
 func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveInterestRequest) (*user.EmptyRequest, error) {
-	Log.Info("Removing users interest")
+	Log.Info("Removing users interest for user with id:" + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -358,7 +359,7 @@ func (s *UserGatewayStruct) RemoveInterest(ctx context.Context, in *user.RemoveI
 }
 
 func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkillRequest) (*user.EmptyRequest, error) {
-	Log.Info("Removing users skill")
+	Log.Info("Removing users skill for user with id:" + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -374,7 +375,7 @@ func (s *UserGatewayStruct) RemoveSkill(ctx context.Context, in *user.RemoveSkil
 }
 
 func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
-	Log.Info("Get api token")
+	Log.Info("Get api token for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -390,7 +391,7 @@ func (s *UserGatewayStruct) ApiTokenRequest(ctx context.Context, in *user.UserId
 }
 
 func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.UserIdRequest) (*user.ApiTokenResponse, error) {
-	Log.Info("Create api token")
+	Log.Info("Create api token for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -406,7 +407,7 @@ func (s *UserGatewayStruct) ApiTokenCreateRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	Log.Info("Removing api token...")
+	Log.Info("Removing api token for user with id:" + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")
@@ -422,7 +423,7 @@ func (s *UserGatewayStruct) ApiTokenRemoveRequest(ctx context.Context, in *user.
 }
 
 func (s *UserGatewayStruct) CreatePasswordRecoveryRequest(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
-	Log.Info("Stating password recovering...")
+	Log.Info("Stating password recovering for user with username: " + in.Username)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -432,7 +433,7 @@ func (s *UserGatewayStruct) CreatePasswordRecoveryRequest(ctx context.Context, i
 }
 
 func (s *UserGatewayStruct) PasswordRecoveryRequest(ctx context.Context, in *user.NewPasswordRecoveryRequest) (*user.EmptyRequest, error) {
-	Log.Info("Password recovering...")
+	Log.Info("Password recovering with id: " + in.RecoveryId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -442,7 +443,7 @@ func (s *UserGatewayStruct) PasswordRecoveryRequest(ctx context.Context, in *use
 }
 
 func (s *UserGatewayStruct) PasswordlessLoginStart(ctx context.Context, in *user.UsernameRequest) (*user.EmptyRequest, error) {
-	Log.Info("Stating password recovering...")
+	Log.Info("Stating password recovering for user with username: " + in.Username)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -452,7 +453,7 @@ func (s *UserGatewayStruct) PasswordlessLoginStart(ctx context.Context, in *user
 }
 
 func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.PasswordlessLoginRequest) (*user.LoginResponse, error) {
-	Log.Info("Passwordless login")
+	Log.Info("Passwordless login for user with id: " + in.UserId)
 	err := checkValue(in.String())
 	if err != nil {
 		Log.Warn("Input possibly contains malicious data")
@@ -462,7 +463,7 @@ func (s *UserGatewayStruct) PasswordlessLogin(ctx context.Context, in *user.Pass
 }
 
 func (s *UserGatewayStruct) ChangeProfilePrivacy(ctx context.Context, in *user.UserIdRequest) (*user.EmptyRequest, error) {
-	Log.Info("Change profile privacy")
+	Log.Info("Change profile privacy for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
 		Log.Warn("User is not authenticated")

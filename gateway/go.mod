@@ -8,6 +8,7 @@ require (
 	github.com/XWS-BSEP-TIM1-2022/dislinkt/util v0.0.0-20220417140006-3d6f76ba6e2f
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861
@@ -18,7 +19,9 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
+	github.com/lestrrat-go/strftime v1.0.6 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/uber/jaeger-client-go v2.30.0+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect

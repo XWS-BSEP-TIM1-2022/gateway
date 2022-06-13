@@ -27,12 +27,15 @@ func NewMessageGateway(c *config.Config) *MessageGatewayStruct {
 }
 
 func (s *MessageGatewayStruct) GetAllNotifications(ctx context.Context, in *messageService.UserIdRequest) (*messageService.GetAllResponse, error) {
+	Log.Info("Getting all notifications for user with id: " + in.UserId)
 	role, err := s.isUserAuthenticated(ctx)
 	if err != nil {
+		Log.Warn("Unauthenticated request for user with id: " + in.UserId)
 		return &messageService.GetAllResponse{}, err
 	}
 	err = s.roleHavePermission(role, "notification_read")
 	if err != nil {
+		Log.Warn("User with id: " + in.UserId + " doesn't have permission to get requests")
 		return &messageService.GetAllResponse{}, err
 	}
 
