@@ -333,6 +333,20 @@ func (s *ConnectionGatewayStruct) ChangeCommentNotification(ctx context.Context,
 	return s.connectionClient.ChangeCommentNotification(ctx, in)
 }
 
+func (s *ConnectionGatewayStruct) GetAllSuggestionsByUserId(ctx context.Context, in *connectionService.UserIdRequest) (*connectionService.SuggestionsResponse, error) {
+	Log.Info("Getting suggestions request for user with id: " + in.UserId)
+	role, err := s.isUserAuthenticated(ctx)
+	if err != nil {
+		return &connectionService.SuggestionsResponse{}, err
+	}
+	err = s.roleHavePermission(role, "connection_read")
+	if err != nil {
+		return &connectionService.SuggestionsResponse{}, err
+	}
+
+	return s.connectionClient.GetAllSuggestionsByUserId(ctx, in)
+}
+
 func (s *ConnectionGatewayStruct) isUserAuthenticated(ctx context.Context) (string, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	jwt := md.Get("Authorization")

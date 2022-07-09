@@ -7,6 +7,7 @@ import (
 	"gateway/startup/config"
 	connectionService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/connection"
 	jobService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/job"
+	messageService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/message"
 	postService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/post"
 	userService "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/proto/user"
 	tracer "github.com/XWS-BSEP-TIM1-2022/dislinkt/util/tracer"
@@ -74,7 +75,7 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 	postService.RegisterPostServiceServer(s, postGatewayS)
 	connectionService.RegisterConnectionServiceServer(s, connectionGatewayS)
 	jobService.RegisterJobServiceServer(s, jobGatewayS)
-	//messageService.RegisterMessageServiceServer(s, messageGatewayS)
+	messageService.RegisterMessageServiceServer(s, messageGatewayS)
 	// Serve gRPC server
 	log.Println(fmt.Sprintf("Serving gRPC on localhost:%s", server.Config.GrpcPort))
 	go func() {
@@ -119,6 +120,10 @@ func (server *Server) StartServer(userGatewayS *api.UserGatewayStruct, postGatew
 		log.Fatalln("Failed to register Connection gateway:", err)
 	}
 	err = jobService.RegisterJobServiceHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register Connection gateway:", err)
+	}
+	err = messageService.RegisterMessageServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register Connection gateway:", err)
 	}
