@@ -37,8 +37,8 @@ func NewConfig() *Config {
 		CertificatePath:       getEnv("CERTIFICATE_PATH", "certificates/dislinkt.cer"),
 		CertificateKeyPath:    getEnv("CERTIFICATE_KEY_PATH", "certificates/dislinkt_private_key.key"),
 		RolePermissions: map[string][]string{
-			"ADMIN": []string{"user_getAll", "user_read", "user_write", "user_delete", "post_read", "post_write", "post_delete", "post_getAll", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete"},
-			"USER":  []string{"post_read", "user_read", "user_write", "post_write", "post_delete", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete", "block_write", "block_read", "notification_read"},
+			"ADMIN": []string{"user_getAll", "user_read", "user_write", "user_delete", "post_read", "post_write", "post_delete", "post_getAll", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete", "message_read", "message_write", "chat_read", "chat_write"},
+			"USER":  []string{"post_read", "user_read", "user_write", "post_write", "post_delete", "job_read", "job_write", "job_delete", "connection_read", "connection_write", "connection_delete", "block_write", "block_read", "notification_read", "message_read", "message_write", "chat_read", "chat_write"},
 		},
 	}
 }
